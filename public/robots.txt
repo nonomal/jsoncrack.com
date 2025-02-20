@@ -1,4 +1,5 @@
 User-agent: *
+
 Allow: /
-Disallow: /*?*
-Disallow: /widget
+
+Sitemap: https://jsoncrack.com/sitemap.xml

@@ -7,11 +7,13 @@
   "importOrder": [
     "^(react/(.*)$)|^(react$)",
     "^(next/(.*)$)|^(next$)",
+    "^@mantine/core",
+    "^@mantine",
+    "styled",
     "<THIRD_PARTY_MODULES>",
-    "^components/(.*)$",
-    "^utils/(.*)$",
-    "^assets/(.*)$",
+    "^src/(.*)$",
     "^[./]"
   ],
-  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"]
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
 }

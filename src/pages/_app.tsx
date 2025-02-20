@@ -1,74 +1,95 @@
 import React from "react";
 import type { AppProps } from "next/app";
-import localFont from "@next/font/local";
-import { init } from "@sentry/nextjs";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "react-hot-toast";
-import { GoogleAnalytics } from "src/components/GoogleAnalytics";
-import GlobalStyle from "src/constants/globalStyle";
-import { darkTheme, lightTheme } from "src/constants/theme";
-import { ModalController } from "src/containers/ModalController";
-import useStored from "src/store/useStored";
+import { createTheme, MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
+import "@mantine/code-highlight/styles.css";
 import { ThemeProvider } from "styled-components";
+import { NextSeo, SoftwareAppJsonLd } from "next-seo";
+import { GoogleAnalytics } from "nextjs-google-analytics";
+import { Toaster } from "react-hot-toast";
+import GlobalStyle from "../constants/globalStyle";
+import { SEO } from "../constants/seo";
+import { lightTheme } from "../constants/theme";
 
-const monaSans = localFont({
-  src: "./Mona-Sans.woff2",
-  variable: "--mona-sans",
-  display: "swap",
-  fallback: ["Arial, Helvetica, sans-serif", "Tahoma, Verdana, sans-serif"],
-});
-
-if (process.env.NODE_ENV !== "development") {
-  init({
-    dsn: "https://d3345591295d4dd1b8c579b62003d939@o1284435.ingest.sentry.io/6495191",
-    tracesSampleRate: 0.25,
-  });
-}
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: false,
+const theme = createTheme({
+  autoContrast: true,
+  fontSmoothing: false,
+  respectReducedMotion: true,
+  cursorType: "pointer",
+  fontFamily:
+    'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
+  defaultGradient: {
+    from: "#388cdb",
+    to: "#0f037f",
+    deg: 180,
+  },
+  primaryShade: 8,
+  colors: {
+    brightBlue: [
+      "#e6f2ff",
+      "#cee1ff",
+      "#9bc0ff",
+      "#649dff",
+      "#3980fe",
+      "#1d6dfe",
+      "#0964ff",
+      "#0054e4",
+      "#004acc",
+      "#003fb5",
+    ],
+  },
+  radius: {
+    lg: "12px",
+  },
+  components: {
+    Button: {
+      defaultProps: {
+        fw: 500,
+      },
     },
   },
 });
 
+const IS_PROD = process.env.NODE_ENV === "production";
+
 function JsonCrack({ Component, pageProps }: AppProps) {
-  const [isReady, setReady] = React.useState(false);
-  const lightmode = useStored(state => state.lightmode);
-
-  React.useEffect(() => {
-    setReady(true);
-  }, []);
-
-  if (isReady)
-    return (
-      <QueryClientProvider client={queryClient}>
-        <GoogleAnalytics />
-        <ThemeProvider theme={lightmode ? lightTheme : darkTheme}>
+  return (
+    <>
+      <NextSeo {...SEO} />
+      <SoftwareAppJsonLd
+        name="JSON Crack"
+        price="0"
+        priceCurrency="USD"
+        type="SoftwareApplication"
+        operatingSystem="Browser"
+        keywords="json, json viewer, json visualizer, json formatter, json editor, json parser, json to tree view, json to diagram, json graph, json beautifier, json validator, json to csv, json to yaml, json minifier, json schema, json data transformer, json api, online json viewer, online json formatter, online json editor, json tool"
+        applicationCategory="DeveloperApplication"
+        aggregateRating={{ ratingValue: "4.9", ratingCount: "19" }}
+      />
+      <MantineProvider defaultColorScheme="light" theme={theme}>
+        <ThemeProvider theme={lightTheme}>
+          <Toaster
+            position="bottom-right"
+            containerStyle={{
+              bottom: 34,
+              right: 8,
+              fontSize: 14,
+            }}
+            toastOptions={{
+              style: {
+                background: "#4D4D4D",
+                color: "#B9BBBE",
+                borderRadius: 4,
+              },
+            }}
+          />
           <GlobalStyle />
-          <main className={monaSans.className}>
-            <Component {...pageProps} />
-            <ModalController />
-            <Toaster
-              position="top-right"
-              containerStyle={{
-                top: 40,
-                right: 6,
-                fontSize: 14,
-              }}
-              toastOptions={{
-                style: {
-                  background: "#4D4D4D",
-                  color: "#B9BBBE",
-                },
-              }}
-            />
-          </main>
+          {IS_PROD && <GoogleAnalytics trackPageViews />}
+          <Component {...pageProps} />
         </ThemeProvider>
-      </QueryClientProvider>
-    );
+      </MantineProvider>
+    </>
+  );
 }
 
 export default JsonCrack;
